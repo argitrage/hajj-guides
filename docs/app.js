@@ -492,7 +492,12 @@ function renderSearch() {
     node.querySelector("pre").innerHTML = highlight(record.text, terms);
     const bookLink = node.querySelector(".book-link");
     if (bookLink) {
-      bookLink.href = `book.html?source=${encodeURIComponent(record.sourceId)}#${encodeURIComponent(record.id)}`;
+      const bookUrl = `book.html?source=${encodeURIComponent(record.sourceId)}&target=${encodeURIComponent(record.id)}`;
+      bookLink.href = bookUrl;
+      bookLink.addEventListener("click", event => {
+        event.preventDefault();
+        window.location.assign(bookUrl);
+      });
     }
     node.querySelector(".copy-btn").addEventListener("click", async () => {
       await navigator.clipboard.writeText(`${record.source}\n${record.ref}\n\n${record.text}`);
@@ -525,8 +530,9 @@ function renderBook() {
       </article>
     `).join("");
 
-    if (window.location.hash) {
-      const target = document.querySelector(window.location.hash);
+    const targetId = params.get("target") || (window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : "");
+    if (targetId) {
+      const target = document.getElementById(targetId);
       if (target) target.scrollIntoView({ behavior: "instant", block: "start" });
     }
   };
