@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Makarem Shirazi Hajj Rulings Search</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>Makarem Shirazi Hajj Rulings Search</h1>
+        <p>Exact text search across the supplied Shia Hajj resources.</p>
+      </div>
+      <div class="meta">
+        <span id="recordCount">Loading...</span>
+      </div>
+    </header>
+
+    <section class="search-panel" aria-label="Search controls">
+      <label for="query">Search exact words or phrase</label>
+      <div class="search-row">
+        <input id="query" type="search" placeholder="Try: fragrance, umbrella, Tawaf of Nisa, combing" autocomplete="off" autofocus>
+        <button id="clearBtn" type="button">Clear</button>
+      </div>
+      <div class="options">
+        <label><input type="checkbox" id="exactPhrase" checked> exact phrase</label>
+        <label><input type="checkbox" id="caseSensitive"> case sensitive</label>
+        <label>
+          Source
+          <select id="sourceFilter">
+            <option value="all">All sources</option>
+            <option value="makarem-hajj-rites">Hajj rites treatise</option>
+            <option value="makarem-summary">Summary of rulings</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="status" id="status">Type at least two characters to search.</section>
+    <section id="results" class="results" aria-live="polite"></section>
+  </main>
+
+  <template id="resultTemplate">
+    <article class="result">
+      <div class="result-head">
+        <div>
+          <h2></h2>
+          <p class="source"></p>
+        </div>
+        <button type="button" class="copy-btn">Copy text</button>
+      </div>
+      <p class="snippet"></p>
+      <details>
+        <summary>Show full matching text</summary>
+        <pre></pre>
+      </details>
+    </article>
+  </template>
+
+  <script src="search-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

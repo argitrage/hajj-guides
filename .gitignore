@@ -1,0 +1,5 @@
+*.tmp
+~$*.docx
+guides/render_*/
+.DS_Store
+Thumbs.db
