@@ -12,124 +12,40 @@
       <div>
         <p class="eyebrow">Makarem Shirazi rulings + Shia devotional guide</p>
         <h1>Shia Hajj Companion</h1>
-        <p class="lede">Daily rites, Ihram cautions, common mistakes, spiritual reminders, recovery notes, and exact text search.</p>
+        <p class="lede">Choose the guide you need: daily rites, mistakes, Ihram habits, spirituality, recovery help, or exact ruling search.</p>
       </div>
       <div class="meta">
         <span id="recordCount">Loading search...</span>
       </div>
     </header>
 
-    <nav class="tabs" aria-label="Guide sections">
-      <button class="tab active" type="button" data-tab="daily">Daily Guide</button>
-      <button class="tab" type="button" data-tab="mistakes">Common Mistakes</button>
-      <button class="tab" type="button" data-tab="ihram">Ihram Daily Life</button>
-      <button class="tab" type="button" data-tab="spiritual">Spiritual Guidance</button>
-      <button class="tab" type="button" data-tab="clueless">When Clueless</button>
-      <button class="tab" type="button" data-tab="search">Search Rulings</button>
+    <nav class="page-grid" aria-label="Guide pages">
+      <a class="page-card" href="daily.html">
+        <span>Daily Guide</span>
+        <p>Select a Hajj day and see duties, pitfalls, and spiritual focus.</p>
+      </a>
+      <a class="page-card" href="mistakes.html">
+        <span>Common Mistakes</span>
+        <p>High-risk issues that can affect correctness or require atonement.</p>
+      </a>
+      <a class="page-card" href="ihram.html">
+        <span>Ihram Daily Life</span>
+        <p>Toothbrush, washing, perfume, oils, combing, shade, and other habits.</p>
+      </a>
+      <a class="page-card" href="spiritual.html">
+        <span>Spiritual Guidance</span>
+        <p>Shia duas, daily reflection, and inner adab for the journey.</p>
+      </a>
+      <a class="page-card" href="clueless.html">
+        <span>When Clueless</span>
+        <p>What to do when confused, missed Salahs, istighfar, and short acts.</p>
+      </a>
+      <a class="page-card" href="search.html">
+        <span>Search Rulings</span>
+        <p>Exact text search across the supplied Makarem Shirazi resources.</p>
+      </a>
     </nav>
-
-    <section id="daily" class="tab-panel active" aria-labelledby="Daily Guide">
-      <div class="section-head">
-        <div>
-          <h2>Daily Guide</h2>
-          <p>Select the day you are on. Dates follow your plan: 10 Dhu al-Hijjah is 27 May 2026.</p>
-        </div>
-        <label class="select-label">
-          Day
-          <select id="daySelect"></select>
-        </label>
-      </div>
-      <article id="dayDetail" class="detail-panel"></article>
-    </section>
-
-    <section id="mistakes" class="tab-panel" aria-labelledby="Common Mistakes">
-      <div class="section-head">
-        <div>
-          <h2>Common Mistakes</h2>
-          <p>High-risk points that can create invalidity, atonement, or serious confusion.</p>
-        </div>
-      </div>
-      <div id="mistakesGrid" class="card-grid"></div>
-    </section>
-
-    <section id="ihram" class="tab-panel" aria-labelledby="Ihram Daily Life">
-      <div class="section-head">
-        <div>
-          <h2>What Changes in Ihram</h2>
-          <p>Normal habits to handle differently while Muhrim.</p>
-        </div>
-      </div>
-      <div id="ihramList" class="activity-list"></div>
-    </section>
-
-    <section id="spiritual" class="tab-panel" aria-labelledby="Spiritual Guidance">
-      <div class="section-head">
-        <div>
-          <h2>Spiritual Guidance</h2>
-          <p>A practical devotional rhythm for each day, using Shia sources.</p>
-        </div>
-      </div>
-      <div id="spiritualContent" class="stack"></div>
-    </section>
-
-    <section id="clueless" class="tab-panel" aria-labelledby="When Clueless">
-      <div class="section-head">
-        <div>
-          <h2>When I Am Clueless</h2>
-          <p>Simple triage for panic moments, missed prayers, duas, repentance, and short acts.</p>
-        </div>
-      </div>
-      <div id="cluelessContent" class="stack"></div>
-    </section>
-
-    <section id="search" class="tab-panel" aria-labelledby="Search Rulings">
-      <div class="section-head">
-        <div>
-          <h2>Search Rulings</h2>
-          <p>Exact text search across the supplied Makarem Shirazi resources.</p>
-        </div>
-      </div>
-      <section class="search-panel" aria-label="Search controls">
-        <label for="query">Search exact words or phrase</label>
-        <div class="search-row">
-          <input id="query" type="search" placeholder="Try: fragrance, umbrella, Tawaf of Nisa, combing" autocomplete="off">
-          <button id="clearBtn" type="button">Clear</button>
-        </div>
-        <div class="options">
-          <label><input type="checkbox" id="exactPhrase" checked> exact phrase</label>
-          <label><input type="checkbox" id="caseSensitive"> case sensitive</label>
-          <label>
-            Source
-            <select id="sourceFilter">
-              <option value="all">All sources</option>
-              <option value="makarem-hajj-rites">Hajj rites treatise</option>
-              <option value="makarem-summary">Summary of rulings</option>
-            </select>
-          </label>
-        </div>
-      </section>
-      <section class="status" id="status">Type at least two characters to search.</section>
-      <section id="results" class="results" aria-live="polite"></section>
-    </section>
   </main>
-
-  <template id="resultTemplate">
-    <article class="result">
-      <div class="result-head">
-        <div>
-          <h3></h3>
-          <p class="source"></p>
-        </div>
-        <button type="button" class="copy-btn">Copy text</button>
-      </div>
-      <p class="snippet"></p>
-      <details>
-        <summary>Show full matching text</summary>
-        <pre></pre>
-      </details>
-    </article>
-  </template>
-
   <script src="search-data.js"></script>
   <script src="app.js"></script>
 </body>

@@ -348,13 +348,14 @@ const template = document.querySelector("#resultTemplate");
 const daySelect = document.querySelector("#daySelect");
 const dayDetail = document.querySelector("#dayDetail");
 
-recordCount.textContent = `${data.length.toLocaleString()} searchable passages`;
+if (recordCount) recordCount.textContent = `${data.length.toLocaleString()} searchable passages`;
 
 function list(items) {
   return `<ul>${items.map(item => `<li>${item}</li>`).join("")}</ul>`;
 }
 
 function renderDay() {
+  if (!daySelect || !dayDetail) return;
   const selected = dailyGuide.find(day => day.id === daySelect.value) || dailyGuide[0];
   dayDetail.innerHTML = `
     <div class="detail-title">
@@ -374,36 +375,38 @@ function renderDay() {
 }
 
 function renderStaticSections() {
-  daySelect.innerHTML = dailyGuide.map(day => `<option value="${day.id}">${day.label}</option>`).join("");
-  renderDay();
+  if (daySelect && dayDetail) {
+    daySelect.innerHTML = dailyGuide.map(day => `<option value="${day.id}">${day.label}</option>`).join("");
+    renderDay();
+  }
 
-  document.querySelector("#mistakesGrid").innerHTML = commonMistakes.map(([title, body]) => `
-    <article class="info-card"><h3>${title}</h3><p>${body}</p></article>
-  `).join("");
+  const mistakesGrid = document.querySelector("#mistakesGrid");
+  if (mistakesGrid) {
+    mistakesGrid.innerHTML = commonMistakes.map(([title, body]) => `
+      <article class="info-card"><h3>${title}</h3><p>${body}</p></article>
+    `).join("");
+  }
 
-  document.querySelector("#ihramList").innerHTML = ihramActivities.map(([name, body]) => `
-    <article class="activity-item"><h3>${name}</h3><p>${body}</p></article>
-  `).join("");
+  const ihramList = document.querySelector("#ihramList");
+  if (ihramList) {
+    ihramList.innerHTML = ihramActivities.map(([name, body]) => `
+      <article class="activity-item"><h3>${name}</h3><p>${body}</p></article>
+    `).join("");
+  }
 
-  document.querySelector("#spiritualContent").innerHTML = spiritualBlocks.map(block => `
-    <article class="wide-card"><h3>${block.title}</h3>${list(block.items)}</article>
-  `).join("");
+  const spiritualContent = document.querySelector("#spiritualContent");
+  if (spiritualContent) {
+    spiritualContent.innerHTML = spiritualBlocks.map(block => `
+      <article class="wide-card"><h3>${block.title}</h3>${list(block.items)}</article>
+    `).join("");
+  }
 
-  document.querySelector("#cluelessContent").innerHTML = cluelessBlocks.map(block => `
-    <article class="wide-card"><h3>${block.title}</h3>${list(block.items)}</article>
-  `).join("");
-}
-
-function setupTabs() {
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach(item => item.classList.remove("active"));
-      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
-      tab.classList.add("active");
-      document.querySelector(`#${tab.dataset.tab}`).classList.add("active");
-      if (tab.dataset.tab === "search") queryInput.focus();
-    });
-  });
+  const cluelessContent = document.querySelector("#cluelessContent");
+  if (cluelessContent) {
+    cluelessContent.innerHTML = cluelessBlocks.map(block => `
+      <article class="wide-card"><h3>${block.title}</h3>${list(block.items)}</article>
+    `).join("");
+  }
 }
 
 function escapeHtml(value) {
@@ -417,10 +420,12 @@ function escapeHtml(value) {
 }
 
 function normal(value) {
+  if (!caseSensitive) return value.toLowerCase();
   return caseSensitive.checked ? value : value.toLowerCase();
 }
 
 function termsFor(query) {
+  if (!exactPhrase) return [query];
   if (exactPhrase.checked) return [query];
   return query.split(/\s+/).filter(Boolean);
 }
@@ -441,7 +446,7 @@ function highlight(text, terms) {
   const sorted = [...terms].sort((a, b) => b.length - a.length).filter(Boolean);
   for (const term of sorted) {
     const escapedTerm = escapeHtml(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const flags = caseSensitive.checked ? "g" : "gi";
+    const flags = caseSensitive && caseSensitive.checked ? "g" : "gi";
     escaped = escaped.replace(new RegExp(escapedTerm, flags), match => `<mark>${match}</mark>`);
   }
   return escaped;
@@ -458,6 +463,7 @@ function snippet(record, terms) {
 }
 
 function renderSearch() {
+  if (!queryInput || !results || !statusEl || !template) return;
   const query = queryInput.value.trim();
   results.innerHTML = "";
 
@@ -493,15 +499,16 @@ function renderSearch() {
 }
 
 renderStaticSections();
-setupTabs();
-daySelect.addEventListener("change", renderDay);
-queryInput.addEventListener("input", renderSearch);
-exactPhrase.addEventListener("change", renderSearch);
-caseSensitive.addEventListener("change", renderSearch);
-sourceFilter.addEventListener("change", renderSearch);
-clearBtn.addEventListener("click", () => {
-  queryInput.value = "";
-  queryInput.focus();
-  renderSearch();
-});
+if (daySelect) daySelect.addEventListener("change", renderDay);
+if (queryInput) queryInput.addEventListener("input", renderSearch);
+if (exactPhrase) exactPhrase.addEventListener("change", renderSearch);
+if (caseSensitive) caseSensitive.addEventListener("change", renderSearch);
+if (sourceFilter) sourceFilter.addEventListener("change", renderSearch);
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    queryInput.value = "";
+    queryInput.focus();
+    renderSearch();
+  });
+}
 renderSearch();
