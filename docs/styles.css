@@ -407,6 +407,33 @@ a {
   font-size: 0.92rem;
 }
 
+.book-link-row {
+  margin: 10px 0 0;
+}
+
+.book-link {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.book-content {
+  display: grid;
+  gap: 14px;
+}
+
+.book-section {
+  scroll-margin-top: 16px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.book-section:target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
 .copy-btn {
   min-height: 36px;
   white-space: nowrap;

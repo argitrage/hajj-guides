@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Read Source Book - Shia Hajj Companion</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="page-header">
+      <a href="search.html" class="back-link">Search</a>
+      <div>
+        <p class="eyebrow">Source text reader</p>
+        <h1 id="bookTitle">Source Book</h1>
+        <p class="lede">Read the extracted source text around a search result. This is a lightweight reader, not a visual EPUB replica.</p>
+      </div>
+      <label class="select-label">
+        Book
+        <select id="bookSource">
+          <option value="makarem-hajj-rites">The Rites of Hajj</option>
+          <option value="makarem-summary">A Summary of Rulings</option>
+        </select>
+      </label>
+    </header>
+    <section id="bookContent" class="book-content"></section>
+  </main>
+  <script src="search-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

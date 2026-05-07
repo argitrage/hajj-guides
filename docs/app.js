@@ -237,6 +237,7 @@ const commonMistakes = [
 const ihramActivities = [
   ["Toothbrush", "Allowed, but avoid causing gums to bleed. Use unscented toothpaste where possible."],
   ["Shower / washing", "Allowed. Pour water on the head, but do not submerge the head in water."],
+  ["Hair during ghusl or wudhu", "If hair comes out while rubbing/washing during ghusl or ablution for prayer, Makarem says there is nothing on you. It is better to wash the head when doing ghusl and not avoid ghusl out of fear of normal hair loss."],
   ["Soap / shampoo / wipes", "Use unscented products only. Keep scented items away from Ihram clothes."],
   ["Perfume / attar / deodorant", "Do not apply, smell intentionally, spray, or use fragrant body products."],
   ["Creams / oils / lotion", "Do not apply oil or cream, even unscented, unless for treatment."],
@@ -246,7 +247,7 @@ const ihramActivities = [
   ["Shaving / trimming", "Not allowed until Taqsir/Halq. Do not trim someone else before your own exit from Ihram."],
   ["Mirror", "Do not use for grooming. Accidental looking or medical/injury use is fine."],
   ["Men's shoes and socks", "Avoid socks or shoes covering the whole top of the foot. Use sandals with exposed top."],
-  ["Men's head covering", "Do not cover the head, even partly as obligatory precaution."],
+  ["Men's head covering", "Do not cover the head, even partly as obligatory precaution. When drying after shower/ghusl, be careful not to wrap or cover the head with the towel."],
   ["Women's face covering", "Do not cover like a mask. Veil-lowering for non-mahram coverage has its own allowance."],
   ["Umbrella / shade", "Men avoid shaded daytime travel; women may use shade. Fixed shade in Mecca, Arafat, Mash'ar, and Mina is allowed."],
   ["Insects", "Avoid killing insects unless they harm or seriously disturb you."],
@@ -299,12 +300,12 @@ const cluelessBlocks = [
     ]
   },
   {
-    title: "If Salahs are missed",
+    title: "If I am unsure what worship to do",
     items: [
-      "Do not panic or give up the rest of the day.",
-      "Pray the missed wajib Salah as qadha as soon as reasonably possible.",
-      "Keep the next prayer on time. Do not let one missed prayer become two.",
-      "If unsure about shortened/full prayer while travelling or intending ten days, ask your scholar and write down the rule for your itinerary."
+      "After doing any time-sensitive Hajj duty and asking about urgent rulings, use empty/confused time for qadha Salah from your life.",
+      "Pray missed wajib prayers of your lifetime with the intention of qadha ma fi al-dhimmah, meaning whatever missed prayer is actually on your responsibility.",
+      "Keep it simple: two rak'ah qadha Fajr, four rak'ah qadha Zuhr, four rak'ah qadha Asr, three rak'ah qadha Maghrib, four rak'ah qadha Isha, according to your normal qadha duty.",
+      "Do not let optional qadha make you miss the current wajib prayer or a time-bound Hajj rite."
     ]
   },
   {
@@ -489,6 +490,10 @@ function renderSearch() {
     node.querySelector(".source").textContent = record.source;
     node.querySelector(".snippet").innerHTML = highlight(snippet(record, terms), terms);
     node.querySelector("pre").innerHTML = highlight(record.text, terms);
+    const bookLink = node.querySelector(".book-link");
+    if (bookLink) {
+      bookLink.href = `book.html?source=${encodeURIComponent(record.sourceId)}#${encodeURIComponent(record.id)}`;
+    }
     node.querySelector(".copy-btn").addEventListener("click", async () => {
       await navigator.clipboard.writeText(`${record.source}\n${record.ref}\n\n${record.text}`);
       node.querySelector(".copy-btn").textContent = "Copied";
@@ -496,6 +501,44 @@ function renderSearch() {
     });
     results.appendChild(node);
   }
+}
+
+function renderBook() {
+  const bookContent = document.querySelector("#bookContent");
+  const bookSource = document.querySelector("#bookSource");
+  if (!bookContent || !bookSource) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const initialSource = params.get("source") || "makarem-hajj-rites";
+  bookSource.value = initialSource;
+
+  const draw = () => {
+    const sourceId = bookSource.value;
+    const records = data.filter(record => record.sourceId === sourceId);
+    const title = records[0]?.source || "Source book";
+    document.querySelector("#bookTitle").textContent = title;
+    bookContent.innerHTML = records.map(record => `
+      <article class="book-section" id="${record.id}">
+        <p class="eyebrow">${record.ref}</p>
+        ${record.heading && record.heading !== record.ref ? `<h3>${escapeHtml(record.heading)}</h3>` : ""}
+        <pre>${escapeHtml(record.text)}</pre>
+      </article>
+    `).join("");
+
+    if (window.location.hash) {
+      const target = document.querySelector(window.location.hash);
+      if (target) target.scrollIntoView({ behavior: "instant", block: "start" });
+    }
+  };
+
+  bookSource.addEventListener("change", () => {
+    const next = new URL(window.location.href);
+    next.searchParams.set("source", bookSource.value);
+    next.hash = "";
+    window.history.replaceState(null, "", next);
+    draw();
+  });
+  draw();
 }
 
 renderStaticSections();
@@ -512,3 +555,4 @@ if (clearBtn) {
   });
 }
 renderSearch();
+renderBook();
