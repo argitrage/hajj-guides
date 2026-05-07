@@ -112,6 +112,7 @@ def build_data():
 def write_site(records):
     data_js = "window.SEARCH_DATA = " + json.dumps(records, ensure_ascii=False, indent=2) + ";\n"
     (DOCS / "search-data.js").write_text(data_js, encoding="utf-8")
+    return
 
     (DOCS / "index.html").write_text(
         """<!doctype html>
