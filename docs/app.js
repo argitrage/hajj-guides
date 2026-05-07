@@ -222,6 +222,11 @@ const dailyGuide = [
 ];
 
 const commonMistakes = [
+  ["Arguing and anger", "Ihram is not only clothing. Guard the tongue from fighting, anger, harsh replies, humiliating people, and proving yourself right in the crowd."],
+  ["Backbiting and random talk", "Avoid backbiting, useless talk, gossip, complaining, and speech that wastes the heart of Hajj. Silence with salawat is safer than filling every wait with chatter."],
+  ["Sins while in sacred places", "Do not treat the journey as tourism only. Protect the eyes, tongue, money, prayer times, modesty, and people's rights in Mecca, Arafat, Mash'ar, and Mina."],
+  ["Forgetting intention", "Before every act, pause for intention: Ihram, Tawaf, Tawaf prayer, Sa'y, Taqsir, Wuquf, Ramy, sacrifice, Halq/Taqsir, Baytutah, Tawaf al-Nisa, and its prayer."],
+  ["Ablution with drinking water", "Carry water for drinking, but do not casually use scarce shared drinking water for wudhu if it harms others or wastes needed supplies. Plan wudhu before crowds and heat."],
   ["Taqsir confusion", "Do not end Umrah al-Tamattu with nail cutting alone. Cut hair. In Hajj, do Taqsir/Halq after Ramy and sacrifice."],
   ["Using fragrance too early", "Perfume, attar, scented soap, scented wipes, deodorant, rose, musk, saffron, and fragrant foods are Ihram risks. Fragrance becomes halal only after Tawaf of Hajj, its prayer, and Sa'y."],
   ["Tawaf al-Nisa forgotten", "Tawaf al-Nisa and its prayer are obligatory for men and women, married and single. Spouse is not halal until they are done."],
@@ -232,6 +237,49 @@ const commonMistakes = [
   ["Mash'ar missed casually", "Mash'ar Wuquf is a pillar. If you are in an excused group, know the special allowance and timing."],
   ["Mina night timing", "The 11th and 12th nights require Mina stay unless exempt. Half the night is enough; track it."],
   ["Open-ended uncertainty", "If something goes wrong, record exact time, place, rite, intention, and whether it was deliberate, forgetful, ignorant, or forced. Then ask a Shia scholar."]
+];
+
+const checklistGroups = [
+  {
+    title: "Carry during rites",
+    items: [
+      "Water bottle",
+      "Spray bottle",
+      "Comfortable Ihram-safe footwear",
+      "Sunglasses",
+      "Mina map or saved offline map",
+      "Small side bag",
+      "Passport copy",
+      "Cash in Saudi riyal",
+      "Dry fruit or compact snacks",
+      "ORS/electrolytes",
+      "Essential medicines"
+    ]
+  },
+  {
+    title: "Ihram and worship",
+    items: [
+      "Extra Ihram",
+      "Turbah",
+      "Janamaz/prayer mat",
+      "Dua books or offline dua app",
+      "Small scissors for Taqsir when allowed",
+      "Nail cutter for before Ihram or after restrictions lift",
+      "Hook or clip for hanging small items"
+    ]
+  },
+  {
+    title: "Hygiene and travel",
+    items: [
+      "Scent-free toiletries",
+      "Unscented sanitizer",
+      "Unscented wipes",
+      "Travel adaptor",
+      "Medicine list and prescriptions",
+      "Spare bag for pebbles",
+      "Zip pouch for documents and cash"
+    ]
+  }
 ];
 
 const ihramActivities = [
@@ -405,6 +453,13 @@ function renderStaticSections() {
   const cluelessContent = document.querySelector("#cluelessContent");
   if (cluelessContent) {
     cluelessContent.innerHTML = cluelessBlocks.map(block => `
+      <article class="wide-card"><h3>${block.title}</h3>${list(block.items)}</article>
+    `).join("");
+  }
+
+  const checklistContent = document.querySelector("#checklistContent");
+  if (checklistContent) {
+    checklistContent.innerHTML = checklistGroups.map(block => `
       <article class="wide-card"><h3>${block.title}</h3>${list(block.items)}</article>
     `).join("");
   }
