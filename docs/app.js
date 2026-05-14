@@ -499,9 +499,12 @@ const fuzzySynonyms = {
   hair: ["hairs", "shaving", "halq", "taqsir", "trim", "cutting", "comb", "combing"],
   oil: ["oils", "applying", "ointment", "cream"],
   oils: ["oil", "applying", "ointment", "cream"],
-  argument: ["arguing", "quarrel", "quarrelling", "fight", "fighting", "anger"],
-  arguing: ["argument", "quarrel", "quarrelling", "fight", "fighting", "anger"],
-  anger: ["angry", "arguing", "argument", "quarrel", "quarrelling"],
+  argument: ["arguing", "quarrel", "quarrelling", "fight", "fighting", "anger", "dispute", "disputing", "debate", "enmity", "wrangling", "swearing", "oath", "lying", "insulting", "fosuq", "jidal"],
+  arguing: ["argument", "quarrel", "quarrelling", "fight", "fighting", "anger", "dispute", "disputing", "debate", "enmity", "wrangling", "swearing", "oath", "lying", "insulting", "fosuq", "jidal"],
+  anger: ["angry", "arguing", "argument", "quarrel", "quarrelling", "dispute", "debate", "enmity", "wrangling"],
+  dispute: ["arguing", "argument", "quarrel", "quarrelling", "debate", "enmity", "wrangling", "swearing", "oath", "jidal"],
+  disputing: ["arguing", "argument", "quarrel", "quarrelling", "debate", "enmity", "wrangling", "swearing", "oath", "jidal"],
+  backbiting: ["gossip", "lying", "insulting", "fosuq", "evil", "bad"],
   menstruation: ["period", "monthly", "hayz", "haidh", "menses"],
   period: ["menstruation", "monthly", "hayz", "haidh", "menses"],
   salah: ["salat", "prayer", "prayers", "namaz"],
@@ -604,7 +607,7 @@ function fuzzyScore(record, terms) {
     for (const candidate of expandedTerms(term)) {
       const normalizedCandidate = simpleNormal(candidate);
       if (!normalizedCandidate) continue;
-      if (index.text.includes(normalizedCandidate)) {
+      if (normalizedCandidate.includes(" ") && index.text.includes(normalizedCandidate)) {
         best = Math.max(best, candidate === term ? 12 : 9);
         continue;
       }
