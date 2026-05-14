@@ -157,6 +157,25 @@ h4 {
   line-height: 1.45;
 }
 
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 22px;
+}
+
+.quick-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--accent-dark);
+  text-decoration: none;
+}
+
 .page-select {
   margin-bottom: 14px;
 }
@@ -304,10 +323,22 @@ li:last-child {
   gap: 14px;
 }
 
+.place-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .info-card,
 .activity-item,
 .wide-card {
   padding: 16px;
+}
+
+.source-card p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .info-card p,
@@ -475,6 +506,7 @@ pre {
 @media (max-width: 900px) {
   .three-col,
   .card-grid,
+  .place-grid,
   .activity-list,
   .page-grid {
     grid-template-columns: 1fr;
