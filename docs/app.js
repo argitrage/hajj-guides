@@ -386,6 +386,7 @@ const cluelessBlocks = [
 ];
 
 const queryInput = document.querySelector("#query");
+const searchMode = document.querySelector("#searchMode");
 const exactPhrase = document.querySelector("#exactPhrase");
 const caseSensitive = document.querySelector("#caseSensitive");
 const sourceFilter = document.querySelector("#sourceFilter");
@@ -480,6 +481,108 @@ function normal(value) {
   return caseSensitive.checked ? value : value.toLowerCase();
 }
 
+const fuzzySynonyms = {
+  umbrella: ["shade", "shading", "shadow", "canopy", "roof", "roofed"],
+  shade: ["umbrella", "shading", "shadow", "canopy", "roof", "roofed"],
+  perfume: ["fragrance", "scent", "scented", "attar", "deodorant", "musk", "rose", "saffron", "smell"],
+  fragrance: ["perfume", "scent", "scented", "attar", "deodorant", "musk", "rose", "saffron"],
+  scent: ["perfume", "fragrance", "scented", "attar", "deodorant", "musk", "rose", "saffron"],
+  toothbrush: ["tooth", "teeth", "mouth", "paste", "toothpaste", "miswak", "siwak", "brush"],
+  toothpaste: ["tooth", "teeth", "mouth", "paste", "toothbrush", "brush"],
+  shower: ["wash", "washing", "bath", "bathing", "ghusl", "ablution", "wudhu", "water"],
+  washing: ["wash", "shower", "bath", "bathing", "ghusl", "ablution", "wudhu"],
+  wudhu: ["ablution", "wash", "washing", "ghusl"],
+  ablution: ["wudhu", "wash", "washing", "ghusl"],
+  ghusl: ["bath", "bathing", "shower", "wash", "washing", "ablution", "wudhu"],
+  comb: ["combing", "hair", "brush"],
+  combing: ["comb", "hair", "brush"],
+  hair: ["hairs", "shaving", "halq", "taqsir", "trim", "cutting", "comb", "combing"],
+  oil: ["oils", "applying", "ointment", "cream"],
+  oils: ["oil", "applying", "ointment", "cream"],
+  argument: ["arguing", "quarrel", "quarrelling", "fight", "fighting", "anger"],
+  arguing: ["argument", "quarrel", "quarrelling", "fight", "fighting", "anger"],
+  anger: ["angry", "arguing", "argument", "quarrel", "quarrelling"],
+  menstruation: ["period", "monthly", "hayz", "haidh", "menses"],
+  period: ["menstruation", "monthly", "hayz", "haidh", "menses"],
+  salah: ["salat", "prayer", "prayers", "namaz"],
+  salat: ["salah", "prayer", "prayers", "namaz"],
+  prayer: ["salah", "salat", "prayers", "namaz"],
+  tawaf: ["tawaaf", "circumambulation"],
+  saee: ["sa'y", "sai", "sayi", "safa", "marwa"],
+  say: ["sa'y", "saee", "sai", "safa", "marwa"],
+  safa: ["marwa", "sa'y", "saee", "sai"],
+  marwa: ["safa", "sa'y", "saee", "sai"],
+  mina: ["mena"],
+  mena: ["mina"],
+  arafat: ["arafah", "arafa"],
+  arafah: ["arafat", "arafa"],
+  mashar: ["mash'ar", "muzdalifah", "mashaar"],
+  muzdalifah: ["mashar", "mash'ar", "mashaar"],
+  jamarat: ["jamarah", "ramy", "rami", "stoning"],
+  ramy: ["rami", "stoning", "jamarat", "jamarah"]
+};
+
+const fuzzyStopWords = new Set([
+  "a", "an", "and", "are", "as", "at", "be", "by", "can", "do", "does", "for", "from", "i", "in",
+  "is", "it", "me", "my", "of", "on", "or", "the", "this", "to", "use", "what", "when", "where", "with"
+]);
+
+function simpleNormal(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/['']/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function fuzzyTermsFor(query) {
+  return simpleNormal(query)
+    .split(/\s+/)
+    .filter(term => term.length > 1 && !fuzzyStopWords.has(term));
+}
+
+function expandedTerms(term) {
+  return [term, ...(fuzzySynonyms[term] || [])];
+}
+
+function recordIndex(record) {
+  if (!record._searchIndex) {
+    const text = simpleNormal(`${record.ref} ${record.heading} ${record.text}`);
+    record._searchIndex = {
+      text,
+      tokens: Array.from(new Set(text.split(/\s+/).filter(Boolean)))
+    };
+  }
+  return record._searchIndex;
+}
+
+function editDistance(a, b, limit) {
+  if (Math.abs(a.length - b.length) > limit) return limit + 1;
+  let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const current = [i];
+    let rowMin = current[0];
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      current[j] = Math.min(
+        previous[j] + 1,
+        current[j - 1] + 1,
+        previous[j - 1] + cost
+      );
+      rowMin = Math.min(rowMin, current[j]);
+    }
+    if (rowMin > limit) return limit + 1;
+    previous = current;
+  }
+  return previous[b.length];
+}
+
+function closeEnough(a, b) {
+  if (a.length < 4 || b.length < 4) return false;
+  const limit = Math.max(a.length, b.length) <= 6 ? 1 : 2;
+  return editDistance(a, b, limit) <= limit;
+}
+
 function termsFor(query) {
   if (!exactPhrase) return [query];
   if (exactPhrase.checked) return [query];
@@ -489,6 +592,40 @@ function termsFor(query) {
 function matches(record, terms) {
   const haystack = normal(`${record.ref} ${record.heading} ${record.text}`);
   return terms.every(term => haystack.includes(normal(term)));
+}
+
+function fuzzyScore(record, terms) {
+  const index = recordIndex(record);
+  let score = 0;
+  let matched = 0;
+
+  for (const term of terms) {
+    let best = 0;
+    for (const candidate of expandedTerms(term)) {
+      const normalizedCandidate = simpleNormal(candidate);
+      if (!normalizedCandidate) continue;
+      if (index.text.includes(normalizedCandidate)) {
+        best = Math.max(best, candidate === term ? 12 : 9);
+        continue;
+      }
+      for (const token of index.tokens) {
+        if (token === normalizedCandidate) {
+          best = Math.max(best, candidate === term ? 10 : 8);
+          break;
+        }
+        if (token.startsWith(normalizedCandidate) || normalizedCandidate.startsWith(token)) {
+          best = Math.max(best, 6);
+        } else if (closeEnough(token, normalizedCandidate)) {
+          best = Math.max(best, 5);
+        }
+      }
+    }
+    if (best > 0) matched += 1;
+    score += best;
+  }
+
+  const needed = terms.length <= 2 ? terms.length : Math.ceil(terms.length * 0.6);
+  return matched >= needed ? score + matched * 3 : 0;
 }
 
 function findFirstIndex(text, terms) {
@@ -528,23 +665,40 @@ function renderSearch() {
     return;
   }
 
-  const terms = termsFor(query);
+  const mode = searchMode ? searchMode.value : "exact";
+  const terms = mode === "fuzzy" ? fuzzyTermsFor(query) : termsFor(query);
+  if (!terms.length) {
+    statusEl.textContent = "Type at least one searchable word.";
+    return;
+  }
+  const displayTerms = mode === "fuzzy"
+    ? Array.from(new Set(terms.flatMap(term => expandedTerms(term))))
+    : terms;
   const source = sourceFilter.value;
-  const found = data
-    .filter(record => source === "all" || record.sourceId === source)
-    .filter(record => matches(record, terms))
-    .slice(0, 100);
+  const filtered = data.filter(record => source === "all" || record.sourceId === source);
+  const found = mode === "fuzzy"
+    ? filtered
+      .map(record => ({ record, score: fuzzyScore(record, terms) }))
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 100)
+      .map(item => item.record)
+    : filtered
+      .filter(record => matches(record, terms))
+      .slice(0, 100);
 
   statusEl.textContent = found.length
-    ? `Showing ${found.length} result${found.length === 1 ? "" : "s"}${found.length === 100 ? " (first 100)" : ""}.`
-    : "No exact match found. Try fewer words or turn off exact phrase.";
+    ? `Showing ${found.length} ${mode} result${found.length === 1 ? "" : "s"}${found.length === 100 ? " (first 100)" : ""}.`
+    : mode === "fuzzy"
+      ? "No fuzzy match found. Try fewer or simpler words."
+      : "No exact match found. Try fewer words, turn off exact phrase, or switch to fuzzy.";
 
   for (const record of found) {
     const node = template.content.firstElementChild.cloneNode(true);
     node.querySelector("h3").textContent = `${record.ref}${record.heading && record.heading !== record.ref ? " - " + record.heading : ""}`;
     node.querySelector(".source").textContent = record.source;
-    node.querySelector(".snippet").innerHTML = highlight(snippet(record, terms), terms);
-    node.querySelector("pre").innerHTML = highlight(record.text, terms);
+    node.querySelector(".snippet").innerHTML = highlight(snippet(record, displayTerms), displayTerms);
+    node.querySelector("pre").innerHTML = highlight(record.text, displayTerms);
     const bookLink = node.querySelector(".book-link");
     if (bookLink) {
       const bookUrl = `book.html?source=${encodeURIComponent(record.sourceId)}&target=${encodeURIComponent(record.id)}`;
@@ -605,6 +759,7 @@ function renderBook() {
 renderStaticSections();
 if (daySelect) daySelect.addEventListener("change", renderDay);
 if (queryInput) queryInput.addEventListener("input", renderSearch);
+if (searchMode) searchMode.addEventListener("change", renderSearch);
 if (exactPhrase) exactPhrase.addEventListener("change", renderSearch);
 if (caseSensitive) caseSensitive.addEventListener("change", renderSearch);
 if (sourceFilter) sourceFilter.addEventListener("change", renderSearch);

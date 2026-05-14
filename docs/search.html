@@ -13,7 +13,7 @@
       <div>
         <p class="eyebrow">Exact source text</p>
         <h1>Search Rulings</h1>
-        <p class="lede">Search exact matching passages from the supplied Makarem Shirazi resources.</p>
+        <p class="lede">Search exact or approximate matching passages from the supplied Makarem Shirazi resources.</p>
       </div>
       <div class="meta">
         <span id="recordCount">Loading search...</span>
@@ -21,12 +21,19 @@
     </header>
 
     <section class="search-panel" aria-label="Search controls">
-      <label for="query">Search exact words or phrase</label>
+      <label for="query">Search words, phrases, or related Hajj terms</label>
       <div class="search-row">
         <input id="query" type="search" placeholder="Try: fragrance, umbrella, Tawaf of Nisa, combing" autocomplete="off" autofocus>
         <button id="clearBtn" type="button">Clear</button>
       </div>
       <div class="options">
+        <label>
+          Match
+          <select id="searchMode">
+            <option value="exact">Exact</option>
+            <option value="fuzzy">Fuzzy</option>
+          </select>
+        </label>
         <label><input type="checkbox" id="exactPhrase" checked> exact phrase</label>
         <label><input type="checkbox" id="caseSensitive"> case sensitive</label>
         <label>
